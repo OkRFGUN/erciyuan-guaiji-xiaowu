@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>像素风情绪小屋</title>
+  <style>
+    @import url('https://fonts.googleapis.cn/css2?family=Press+Start+2P&display=swap');
+    :root {
+      --bg:#f5d7a1;--bg-soft:#f2b971;--wall:#f7e7c6;--wall-shadow:#e2c48c;--floor:#a86f4f;--floor-line:#83553f;
+      --accent:#ffb347;--accent-2:#ff6fa8;--pixel-dark:#33251a;--pixel-mid:#6b4a33;--pixel-light:#fff3d8;
+      --window-sky:#88c5ff;--window-cloud:#eaf8ff;--particle:#ffd76a;--overlay:rgba(17,11,24,0.3);
+      --cute:#ff8db8;--button-face:#ffe49d;--button-shadow:#b87645;--button-active:#ffcf66;
+      --shadow-opacity:0.18;--glow-opacity:0.42;--ui-panel:rgba(255,244,214,0.8);
+      --transition-fast:240ms steps(2,end);--transition-slow:720ms ease;--panel-bg:rgba(255,250,240,0.82);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;font-family:'Press Start 2P','Courier New',monospace;
+      background:radial-gradient(circle at top,rgba(255,243,209,0.65),transparent 32%),linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 74%,#9e6b57 26%) 100%);
+      color:var(--pixel-dark);transition:background var(--transition-slow),color var(--transition-slow);overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.04) 50%,transparent 50%),linear-gradient(rgba(51,37,26,0.02) 50%,transparent 50%);background-size:8px 8px;opacity:0.45;mix-blend-mode:soft-light;pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;inset:0;background:radial-gradient(circle at 15% 18%,rgba(255,255,255,0.35),transparent 16%),radial-gradient(circle at 80% 12%,rgba(255,205,137,0.22),transparent 18%),radial-gradient(circle at 50% 90%,rgba(127,84,207,0.12),transparent 22%);opacity:0.9;pointer-events:none;z-index:0}
+    .app{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1}
+    .shell{width:min(100%,1400px);padding:20px;border:4px solid var(--pixel-dark);background:linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0.08)),var(--ui-panel);box-shadow:0 0 0 4px color-mix(in srgb,var(--cute) 58%,#fff 42%),0 20px 0 rgba(51,37,26,0.14),0 30px 48px rgba(51,37,26,0.25);position:relative;overflow:hidden;backdrop-filter:blur(5px)}
+    .notice-banner{margin-bottom:20px;padding:16px;border:4px dashed var(--cute);background:rgba(255,255,255,0.6);font-size:10px;line-height:2}
+    .notice-banner code{background:var(--button-face);padding:4px 8px;border:2px solid var(--pixel-dark)}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+    .title-block{display:grid;gap:8px;max-width:520px}.eyebrow{font-size:10px;color:var(--pixel-mid);opacity:0.85}
+    h1{margin:0;font-size:clamp(16px,2.6vw,26px);line-height:1.5;letter-spacing:1px}
+    .subtitle{margin:0;font-size:10px;line-height:1.8;color:var(--pixel-mid)}
+    .mood-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;max-width:620px}
+    .mood-btn,.music-btn,.track-btn,.prop-btn,.transport-btn,.prop-hit,.cat,.lamp-btn,.record-player{border:none;cursor:pointer;font:inherit;color:var(--pixel-dark);position:relative;transition:transform var(--transition-fast),background var(--transition-fast),filter var(--transition-fast);background:none;padding:0}
+    .mood-btn{padding:10px 12px;min-width:92px;background:var(--button-face);font-size:10px;line-height:1.4;box-shadow:0 0 0 4px var(--pixel-dark),0 4px 0 4px var(--button-shadow),inset 0 -4px 0 rgba(51,37,26,0.16)}
+    .mood-btn::before,.music-btn::before,.transport-btn::before,.track-btn::before,.prop-btn::before,.prop-hit::before{content:'';position:absolute;inset:-4px;opacity:0;pointer-events:none;transition:opacity var(--transition-fast);border:4px solid var(--cute)}
+    .mood-btn::after{content:'';position:absolute;inset:auto 6px 6px auto;width:8px;height:8px;background:var(--pixel-light);box-shadow:8px 0 0 var(--pixel-light),0 8px 0 var(--pixel-light),8px 8px 0 var(--pixel-light)}
+    .mood-btn:hover,.music-btn:hover,.transport-btn:hover,.track-btn:hover,.prop-btn:hover,.cat:hover,.lamp-btn:hover,.record-player:hover,.prop-hit:hover{transform:translateY(-2px);outline:none;filter:brightness(1.02)}
+    .mood-btn:focus-visible,.music-btn:focus-visible,.transport-btn:focus-visible,.track-btn:focus-visible,.prop-btn:focus-visible,.prop-hit:focus-visible{transform:translateY(-2px);outline:none}
+    .mood-btn:hover::before,.mood-btn:focus-visible::before,.mood-btn.active::before,.music-btn:hover::before,.music-btn.active::before,.transport-btn:hover::before,.track-btn:hover::before,.track-btn.active::before,.prop-btn:hover::before,.prop-hit:hover::before{opacity:1}
+    .mood-btn.active{background:var(--button-active);transform:translateY(2px);box-shadow:0 0 0 4px var(--pixel-dark),0 2px 0 4px var(--button-shadow),inset 0 4px 0 rgba(255,255,255,0.28)}
+    .stage-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,380px);gap:18px;align-items:stretch}
+    .scene-panel,.side-panel{border:4px solid var(--pixel-dark);background:rgba(255,248,230,0.7);box-shadow:inset 0 0 0 4px rgba(255,255,255,0.18);position:relative;overflow:hidden}
+    .scene-panel{min-height:780px;padding:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0.05)),color-mix(in srgb,var(--wall) 72%,white 28%);transition:background var(--transition-slow)}
+    .scene-panel::before{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(255,255,255,0.06) 50%,transparent 50%),linear-gradient(90deg,rgba(255,255,255,0.06) 50%,transparent 50%);background-size:10px 10px;opacity:0.25;pointer-events:none}
+    .room-stage{position:relative;width:min(100%,920px);aspect-ratio:1.08/1;max-height:880px;isolation:isolate;transform:translateY(6px)}
+    .room{position:absolute;inset:5% 5% 8% 5%;border:6px solid var(--pixel-dark);background:var(--wall);box-shadow:inset 0 -18px 0 var(--wall-shadow),0 14px 0 rgba(51,37,26,0.14);transition:background var(--transition-slow),box-shadow var(--transition-slow);overflow:hidden}
+    .room.lit{box-shadow:inset 0 0 100px rgba(255,220,120,0.12),inset 0 -18px 0 var(--wall-shadow),0 14px 0 rgba(51,37,26,0.14)}
+    .room .wall{position:absolute;inset:0 0 38% 0;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wall) 92%,white 8%) 0 22px,color-mix(in srgb,var(--wall-shadow) 82%,white 18%) 22px 24px)}
+    .room .floor{position:absolute;inset:62% 0 0 0;background:repeating-linear-gradient(90deg,var(--floor) 0 32px,var(--floor-line) 32px 36px),linear-gradient(180deg,color-mix(in srgb,var(--floor) 85%,white 15%),var(--floor));box-shadow:inset 0 6px 0 rgba(255,255,255,0.14);transition:background var(--transition-slow)}
+    .shadow-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,18,calc(var(--shadow-opacity)+0.14)),rgba(10,10,18,calc(var(--shadow-opacity)+0.02)));transition:opacity var(--transition-slow),background var(--transition-slow);opacity:0.32;pointer-events:none;z-index:9}
+    .window{position:absolute;top:8%;left:8%;width:28%;height:26%;border:6px solid var(--pixel-dark);background:var(--window-sky);overflow:hidden;transition:background var(--transition-slow);z-index:1}
+    .window::before,.window::after{content:'';position:absolute;background:rgba(255,255,255,0.26)}
+    .window::before{left:50%;top:0;width:6px;height:100%;transform:translateX(-50%)}
+    .window::after{top:50%;left:0;width:100%;height:6px;transform:translateY(-50%)}
+    .window-curtain{position:absolute;top:-4px;width:14%;height:110%;z-index:2}
+    .window-curtain.left{left:-2%;background:color-mix(in srgb,var(--cute) 50%,white 50%);border:4px solid var(--pixel-dark);border-right:none}
+    .window-curtain.right{right:-2%;background:color-mix(in srgb,var(--accent) 40%,white 60%);border:4px solid var(--pixel-dark);border-left:none}
+    #windowCanvas,#particleCanvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+    .window-decor-img{position:absolute;bottom:4%;right:6%;width:18%;aspect-ratio:1;z-index:3;pointer-events:none}
+    .poster{position:absolute;top:10%;right:8%;width:16%;height:20%;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--cute) 22%,var(--pixel-light) 78%);display:flex;align-items:center;justify-content:center;padding:16px 10px;text-align:center;overflow:hidden;transition:background var(--transition-slow),transform var(--transition-slow);z-index:2}
+    .poster::before,.poster::after{content:'';position:absolute;inset:0;pointer-events:none}
+    .poster::before{background:linear-gradient(90deg,transparent 0 8%,rgba(255,255,255,0.34) 8% 10%,transparent 10% 90%,rgba(255,255,255,0.22) 90% 92%,transparent 92%);opacity:0.8}
+    .poster::after{inset:8px;border:4px dashed color-mix(in srgb,var(--cute) 60%,white 40%);opacity:0.85}
+    .poster.idol::after{border-style:solid;border-color:color-mix(in srgb,var(--accent) 62%,white 38%);box-shadow:inset 0 0 0 4px color-mix(in srgb,var(--cute) 46%,white 54%)}
+    .poster.lace::after{border-style:dotted;border-color:color-mix(in srgb,var(--cute) 74%,white 26%)}
+    .poster-text{position:relative;z-index:1;font-size:clamp(9px,0.95vw,11px);line-height:1.9;color:var(--pixel-dark);text-shadow:2px 2px 0 rgba(255,255,255,0.4);min-height:8em;display:flex;align-items:center;justify-content:center;padding:0 4px;word-break:break-all}
+    .sprite-img{image-rendering:pixelated;image-rendering:crisp-edges;-ms-interpolation-mode:nearest-neighbor}
+    .lamp-btn{position:absolute;top:22%;right:28%;width:10%;height:34%;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+    .lamp-img-wrap{position:relative;width:100%;display:flex;flex-direction:column;align-items:center}
+    .lamp-glow{position:absolute;top:18%;right:18%;width:36%;height:36%;background:radial-gradient(circle,rgba(255,240,172,var(--glow-opacity)) 0%,rgba(255,240,172,0.12) 42%,transparent 74%);opacity:1;transition:opacity var(--transition-slow),transform var(--transition-slow),filter var(--transition-slow);filter:saturate(1.2);pointer-events:none;z-index:3}
+    .lamp-glow.off{opacity:0.08;transform:scale(0.92)}
+    .lamp-glow.on{box-shadow:0 0 80px 30px rgba(255,220,120,0.4),0 0 160px 60px rgba(255,200,80,0.2)}
+    .record-player{position:absolute;left:6%;top:68%;width:16%;height:16%;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--pixel-mid) 72%,white 28%);box-shadow:inset 0 -12px 0 rgba(0,0,0,0.12);z-index:4;display:flex;align-items:center;justify-content:center}
+    .record-player-inner{position:relative;width:100%;height:100%}
+    .record-disc-img{position:absolute;width:54%;aspect-ratio:1;top:12%;left:10%;transform-origin:center;transition:none}
+    .record-player.playing .record-disc-img{animation:spin-pixel 1s steps(4,end) infinite}
+    .record-arm-img{position:absolute;top:14%;right:12%;width:22%;height:55%;transform-origin:top center;transition:transform var(--transition-slow)}
+    .record-player.playing .record-arm-img{transform:rotate(24deg) translateY(2px)}
+    .record-label{position:absolute;right:8%;bottom:8%;font-size:7px;line-height:1.6;color:var(--pixel-light);text-shadow:2px 2px 0 rgba(0,0,0,0.34)}
+    .desk,.figure-shelf,.memo-board,.handheld,.snack-box,.pillows,.plushie,.heart-box,.moon-mobile,.star-garland,.plant{position:absolute}
+    .desk{left:36%;top:48%;width:22%;height:20%;border:3px solid var(--pixel-dark);background:color-mix(in srgb,var(--floor) 62%,white 38%);box-shadow:inset 0 -14px 0 rgba(0,0,0,0.08);z-index:3;transition:transform var(--transition-fast),background var(--transition-slow)}
+    .desk::before{content:'';position:absolute;top:-18%;left:10%;width:34%;height:28%;border:6px solid var(--pixel-dark);background:#7ec6ff;box-shadow:inset 0 -10px 0 rgba(255,255,255,0.18);transition:background var(--transition-fast),box-shadow var(--transition-fast)}
+    .desk.awake::before{background:#ffd9a3;box-shadow:inset 0 0 0 6px rgba(255,255,255,0.18),0 0 0 4px rgba(255,219,157,0.2)}
+    .desk::after{content:'';position:absolute;left:58%;top:8%;width:16%;height:18%;background:var(--cute);box-shadow:0 16px 0 var(--pixel-light),-16px 16px 0 var(--accent)}
+    .figure-shelf{right:8%;top:68%;width:12%;height:18%;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--wall) 72%,var(--accent) 28%);z-index:3;transition:filter var(--transition-fast),transform var(--transition-fast);overflow:hidden}
+    .figure-shelf.glow{filter:brightness(1.08);transform:translateY(-2px)}
+    .memo-board{left:38%;top:8%;width:14%;height:12%;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--pixel-light) 76%,#97d9b8 24%);padding:10px 8px;z-index:2;overflow:hidden;display:grid;align-content:start;gap:6px}
+    .memo-title{font-size:8px;color:var(--pixel-dark)}.memo-text{font-size:8px;line-height:1.6;color:var(--pixel-mid);word-break:break-all}
+    .handheld{left:24%;top:64%;width:8%;height:10%;border:none;background:transparent;z-index:3;transition:transform var(--transition-fast),filter var(--transition-fast);overflow:visible}
+    .handheld.on{filter:brightness(1.08) drop-shadow(0 0 6px rgba(255,215,106,0.35))}
+    .snack-box{left:24%;top:80%;width:8%;height:10%;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--accent) 34%,white 66%);z-index:3;transition:transform var(--transition-fast)}
+    .snack-box.open{transform:translateY(-3px)}
+    .snack-box::before,.snack-box::after{content:'';position:absolute;width:16%;height:16%;background:var(--cute);top:-12%}
+    .snack-box::before{left:18%}.snack-box::after{right:18%}
+    .plant{left:4%;top:34%;width:8%;height:18%;z-index:2}
+    .plant-pot{position:absolute;left:18%;bottom:0;width:56%;height:28%;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--cute) 36%,var(--pixel-light) 64%)}
+    .plant-leaf{position:absolute;width:18%;height:42%;bottom:20%;background:#70bb88;border:4px solid var(--pixel-dark);transform-origin:bottom center;transition:transform var(--transition-fast)}
+    .plant.swing .plant-leaf.l1{transform:rotate(-12deg)}.plant.swing .plant-leaf.l2{transform:rotate(8deg)}.plant.swing .plant-leaf.l3{transform:rotate(-6deg)}
+    .plant-leaf.l1{left:18%}.plant-leaf.l2{left:42%;height:54%}.plant-leaf.l3{left:62%;height:36%}
+    .pillows{right:22%;top:72%;width:10%;height:12%;z-index:2}
+    .pillows::before,.pillows::after{content:'';position:absolute;border:6px solid var(--pixel-dark);background:color-mix(in srgb,var(--cute) 48%,white 52%);box-shadow:inset 0 -8px 0 rgba(0,0,0,0.08)}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="shell">
+      <div class="notice-banner">
+        <strong>👋 这是像素风情绪小屋展示版</strong><br/>
+        你可以和房间里的物件互动，但 <strong>音乐功能需要部署完整 Node.js 服务</strong>。<br/>
+        仓库地址：<code>https://github.com/OkRFGUN/erciyuan-guaiji-xiaowu</code>
+      </div>
+      <div class="topbar">
+        <div class="title-block">
+          <div class="eyebrow">PIXEL EMOTION ROOM</div>
+          <h1>像素风情绪小屋</h1>
+          <div class="subtitle">点击下方按钮切换心情，与房间里的小物件互动</div>
+        </div>
+        <div class="mood-bar">
+          <button class="mood-btn active" data-mood="happy">😊 开心</button>
+          <button class="mood-btn" data-mood="sad">😢 难过</button>
+          <button class="mood-btn" data-mood="calm">😌 平静</button>
+          <button class="mood-btn" data-mood="night">🌙 夜晚</button>
+          <button class="mood-btn" data-mood="lonely">😶 孤独</button>
+        </div>
+      </div>
+      <div class="stage-grid">
+        <div class="scene-panel">
+          <div class="room-stage">
+            <div class="room" id="room">
+              <div class="wall"></div>
+              <div class="floor"></div>
+              <div class="window" id="window">
+                <canvas id="windowCanvas"></canvas>
+                <div class="window-curtain left"></div>
+                <div class="window-curtain right"></div>
+                <img class="window-decor-img sprite-img" src="" alt="" id="windowDecor"/>
+              </div>
+              <div class="poster" id="poster">
+                <div class="poster-text" id="posterText">今天也要好好生活鸭！</div>
+              </div>
+              <button class="lamp-btn" id="lampBtn" type="button">
+                <div class="lamp-glow off" id="lampGlow"></div>
+                <div class="lamp-img-wrap">
+                  <svg class="sprite-img" viewBox="0 0 64 128" width="100%" height="100%" preserveAspectRatio="xMidYMax meet">
+                    <rect x="24" y="84" width="16" height="8" fill="#6b4a33"/>
+                    <rect x="20" y="92" width="24" height="4" fill="#6b4a33"/>
+                    <rect x="28" y="40" width="8" height="44" fill="#ffe49d"/>
+                    <rect x="8" y="4" width="48" height="40" fill="#ffe49d"/>
+                    <rect x="12" y="8" width="40" height="32" fill="#fff3d8"/>
+                  </svg>
+                </div>
+              </button>
+              <button class="record-player" id="recordPlayer" type="button">
+                <div class="record-player-inner">
+                  <svg class="record-disc-img sprite-img" viewBox="0 0 64 64" width="100%" height="100%">
+                    <circle cx="32" cy="32" r="30" fill="#33251a"/>
+                    <circle cx="32" cy="32" r="20" fill="#4a3628"/>
+                    <circle cx="32" cy="32" r="12" fill="#6b4a33"/>
+                    <circle cx="32" cy="32" r="4" fill="#ffe49d"/>
+                  </svg>
+                  <svg class="record-arm-img sprite-img" viewBox="0 0 32 64" width="100%" height="100%">
+                    <rect x="12" y="4" width="8" height="12" fill="#6b4a33"/>
+                    <rect x="10" y="12" width="12" height="48" fill="#8b6a53"/>
+                    <rect x="14" y="56" width="4" height="8" fill="#33251a"/>
+                  </svg>
+                  <div class="record-label">DEMO</div>
+                </div>
+              </button>
+              <div class="desk" id="desk">
+                <svg class="sprite-img" viewBox="0 0 128 128" width="100%" height="100%" style="position:absolute;inset:0">
+                  <rect x="20" y="80" width="88" height="20" fill="#a86f4f"/>
+                  <rect x="24" y="84" width="80" height="12" fill="#8b5a3f"/>
+                  <rect x="28" y="60" width="72" height="24" fill="#c98a5f"/>
+                  <rect x="32" y="64" width="64" height="16" fill="#b97a4f"/>
+                </svg>
+              </div>
+              <button class="figure-shelf" id="figureShelf" type="button"></button>
+              <div class="memo-board" id="memoBoard">
+                <div class="memo-title">便签</div>
+                <div class="memo-text" id="memoText">休息一下~</div>
+              </div>
+              <button class="plant" id="plant" type="button">
+                <div class="plant-pot"></div>
+                <div class="plant-leaf l1"></div>
+                <div class="plant-leaf l2"></div>
+                <div class="plant-leaf l3"></div>
+              </button>
+              <div class="pillows"></div>
+              <canvas id="particleCanvas"></canvas>
+              <div class="shadow-overlay" id="shadowOverlay"></div>
+            </div>
+          </div>
+        </div>
+        <div class="side-panel">
+          <div style="padding:20px;display:grid;gap:16px">
+            <div style="border:4px solid var(--pixel-dark);padding:16px;background:var(--panel-bg)">
+              <div style="font-size:10px;margin-bottom:8px;color:var(--pixel-mid)">💡 房间玩法</div>
+              <div style="font-size:9px;line-height:2;color:var(--pixel-dark)">
+                • 点击顶部按钮切换心情<br/>
+                • 点击台灯开关灯<br/>
+                • 点击唱片机开始/暂停<br/>
+                • 点击植物让它摇摆<br/>
+                • 点击书桌假装工作<br/>
+                • 点击手办架子发光
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const CONFIG = {
+      moodColors: {
+        happy: { bg: '#ffeaa7', accent: '#fdcb6e' },
+        sad: { bg: '#dfe6e9', accent: '#b2bec3' },
+        calm: { bg: '#dfe6e9', accent: '#81ecec' },
+        night: { bg: '#2d3436', accent: '#6c5ce7' },
+        lonely: { bg: '#fab1a0', accent: '#e17055' }
+      }
+    };
+
+    let currentMood = 'calm';
+    let lampOn = false;
+    let plantSwingTimer = null;
+
+    const room = document.getElementById('room');
+    const lampBtn = document.getElementById('lampBtn');
+    const lampGlow = document.getElementById('lampGlow');
+    const recordPlayer = document.getElementById('recordPlayer');
+    const plant = document.getElementById('plant');
+    const desk = document.getElementById('desk');
+    const figureShelf = document.getElementById('figureShelf');
+    const poster = document.getElementById('poster');
+    const posterText = document.getElementById('posterText');
+    const shadowOverlay = document.getElementById('shadowOverlay');
+
+    const moodPosters = {
+      happy: '开心最重要！',
+      sad: '难过也没关系，休息一下',
+      calm: '岁月静好',
+      night: '晚安',
+      lonely: '和自己相处的时光'
+    };
+
+    function setMood(mood) {
+      currentMood = mood;
+      document.documentElement.style.setProperty('--bg', CONFIG.moodColors[mood].bg);
+      document.documentElement.style.setProperty('--accent', CONFIG.moodColors[mood].accent);
+      
+      posterText.textContent = moodPosters[mood];
+      
+      if (mood === 'night') {
+        shadowOverlay.style.opacity = '0.7';
+        lampOn = true;
+        lampGlow.classList.remove('off');
+        lampGlow.classList.add('on');
+        room.classList.add('lit');
+      } else {
+        shadowOverlay.style.opacity = '0.32';
+      }
+
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mood === mood);
+      });
+    }
+
+    lampBtn.addEventListener('click', () => {
+      lampOn = !lampOn;
+      if (lampOn) {
+        lampGlow.classList.remove('off');
+        lampGlow.classList.add('on');
+        room.classList.add('lit');
+      } else {
+        lampGlow.classList.remove('on');
+        lampGlow.classList.add('off');
+        room.classList.remove('lit');
+      }
+    });
+
+    let isPlaying = false;
+    recordPlayer.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      recordPlayer.classList.toggle('playing', isPlaying);
+    });
+
+    plant.addEventListener('click', () => {
+      plant.classList.add('swing');
+      setTimeout(() => plant.classList.remove('swing'), 1000);
+    });
+
+    desk.addEventListener('click', () => {
+      desk.classList.add('awake');
+      setTimeout(() => desk.classList.remove('awake'), 2000);
+    });
+
+    figureShelf.addEventListener('click', () => {
+      figureShelf.classList.add('glow');
+      setTimeout(() => figureShelf.classList.remove('glow'), 1500);
+    });
+
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => setMood(btn.dataset.mood));
+    });
+
+    function initWindowCanvas() {
+      const canvas = document.getElementById('windowCanvas');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      
+      let time = 0;
+      function animate() {
+        time += 0.02;
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        
+        const skyGradient = ctx.createLinearGradient(0, 0, 0, rect.height);
+        if (currentMood === 'night') {
+          skyGradient.addColorStop(0, '#2d3436');
+          skyGradient.addColorStop(1, '#636e72');
+        } else if (currentMood === 'sad') {
+          skyGradient.addColorStop(0, '#b2bec3');
+          skyGradient.addColorStop(1, '#dfe6e9');
+        } else {
+          skyGradient.addColorStop(0, '#74b9ff');
+          skyGradient.addColorStop(1, '#81ecec');
+        }
+        ctx.fillStyle = skyGradient;
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        
+        if (currentMood === 'night') {
+          ctx.fillStyle = '#ffeaa7';
+          ctx.beginPath();
+          ctx.arc(rect.width * 0.7, rect.height * 0.3, 20, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#ffeaa7';
+          ctx.beginPath();
+          ctx.arc(rect.width * 0.6, rect.height * 0.25, 25, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        for (let i = 0; i < 3; i++) {
+          const x = ((i * 0.3 + time * 0.05) % 1.2) * rect.width;
+          const y = rect.height * (0.15 + i * 0.15);
+          ctx.beginPath();
+          ctx.arc(x, y, 12, 0, Math.PI * 2);
+          ctx.arc(x + 15, y - 5, 10, 0, Math.PI * 2);
+          ctx.arc(x + 25, y + 3, 14, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    window.addEventListener('load', () => {
+      setMood('calm');
+      initWindowCanvas();
+    });
+
+    window.addEventListener('resize', () => {
+      initWindowCanvas();
+    });
+  </script>
+</body>
+</html>
