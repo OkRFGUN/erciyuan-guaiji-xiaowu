@@ -1,0 +1,13 @@
+{
+  "name": "erciyuan-guaiji-xiaowu",
+  "version": "2.0.0",
+  "description": "像素风情绪小屋 - 完整版",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "NeteaseCloudMusicApi": "^4.32.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

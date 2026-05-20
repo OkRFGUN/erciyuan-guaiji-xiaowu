@@ -659,6 +659,26 @@
     </main>
   </div>
   <script>
+    var CONFIG = {
+      NETEASE_API: (function() {
+        var host = window.location.hostname;
+        var port = window.location.port;
+        var proto = window.location.protocol;
+        if (host === '127.0.0.1' || host === 'localhost') {
+          return 'http://127.0.0.1:3001';
+        }
+        return proto + '//' + host + (port ? ':' + port : '') + '/netease-api';
+      })(),
+      AUDIO_CACHE: (function() {
+        var host = window.location.hostname;
+        var port = window.location.port;
+        var proto = window.location.protocol;
+        if (host === '127.0.0.1' || host === 'localhost') {
+          return 'http://127.0.0.1:3002';
+        }
+        return proto + '//' + host + (port ? ':' + port : '') + '/audio-cache';
+      })()
+    };
     var currentMood = 'calm';
     var currentVolume = 80;
     var currentSongIndex = 0;
@@ -1597,7 +1617,7 @@
     }
 
     function fetchMetingPlaylist(playlistId) {
-      var localApi = 'http://127.0.0.1:3001';
+      var localApi = CONFIG.NETEASE_API;
       var cookieQuery = neteaseCookie ? ('&cookie=' + encodeURIComponent(neteaseCookie)) : '';
       var localUrl = localApi + '/playlist/detail?id=' + playlistId + cookieQuery;
       console.log('[Netease] Trying local API:', localUrl);
@@ -1616,7 +1636,7 @@
               .then(function(d) {
                 var playable = d.data && d.data[0] ? d.data[0] : null;
                 var proxyCookie = neteaseCookie ? ('&cookie=' + encodeURIComponent(neteaseCookie)) : '';
-                var url = playable && playable.url ? ('http://127.0.0.1:3002/proxy/audio?id=' + encodeURIComponent(t.id) + '&level=exhigh' + proxyCookie) : '';
+                var url = playable && playable.url ? (CONFIG.AUDIO_CACHE + '/proxy/audio?id=' + encodeURIComponent(t.id) + '&level=exhigh' + proxyCookie) : '';
                 return {
                   name: t.name,
                   artist: (t.ar || []).map(function(a) { return a.name; }).join(' / '),
@@ -1979,12 +1999,12 @@
       if (qrImg) qrImg.innerHTML = '';
       clearQRTimers();
       
-      fetch('http://127.0.0.1:3001/login/qr/key')
+      fetch(CONFIG.NETEASE_API + '/login/qr/key')
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (!data.data || !data.data.unikey) throw new Error('获取key失败');
           qrKey = data.data.unikey;
-          return fetch('http://127.0.0.1:3001/login/qr/create?key=' + qrKey + '&qrimg=true');
+          return fetch(CONFIG.NETEASE_API + '/login/qr/create?key=' + qrKey + '&qrimg=true');
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -2006,7 +2026,7 @@
       console.log('[Netease QR] start poll, key =', qrKey);
       qrCheckTimer = setInterval(function() {
         if (!qrKey) return;
-        fetch('http://127.0.0.1:3001/login/qr/check?key=' + qrKey)
+        fetch(CONFIG.NETEASE_API + '/login/qr/check?key=' + qrKey)
           .then(function(r) { return r.json(); })
           .then(function(data) {
             var statusEl = document.getElementById('qrLoginStatus');
@@ -2052,7 +2072,7 @@
       loginStatusPollTimer = setInterval(function() {
         if (!neteaseCookie) return;
         var cookieQuery = '?cookie=' + encodeURIComponent(neteaseCookie);
-        fetch('http://127.0.0.1:3001/login/status' + cookieQuery)
+        fetch(CONFIG.NETEASE_API + '/login/status' + cookieQuery)
           .then(function(r) { return r.json(); })
           .then(function(data) {
             if (data.data && data.data.account && data.data.account.id) {
@@ -2076,7 +2096,7 @@
       var cookieQuery = neteaseCookie ? ('?cookie=' + encodeURIComponent(neteaseCookie)) : '';
       var statusEl = document.getElementById('qrLoginStatus');
       var loginBtn = document.getElementById('neteaseLoginBtn');
-      fetch('http://127.0.0.1:3001/login/status' + cookieQuery)
+      fetch(CONFIG.NETEASE_API + '/login/status' + cookieQuery)
         .then(function(r) { return r.json(); })
         .then(function(data) {
           if (data.data && data.data.account && data.data.account.id) {
@@ -2114,7 +2134,7 @@
     
     function checkNeteaseLoginStatus() {
       var cookieQuery = neteaseCookie ? ('?cookie=' + encodeURIComponent(neteaseCookie)) : '';
-      fetch('http://127.0.0.1:3001/login/status' + cookieQuery)
+      fetch(CONFIG.NETEASE_API + '/login/status' + cookieQuery)
         .then(function(r) { return r.json(); })
         .then(function(data) {
           var loginBtn = document.getElementById('neteaseLoginBtn');

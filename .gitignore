@@ -1,0 +1,6 @@
+node_modules/
+audio-cache/
+netease-api/audio-cache/
+netease-api-v2/audio-cache/
+.DS_Store
+*.log
